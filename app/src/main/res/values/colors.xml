@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#1a4a7a</color>
+    <color name="primary_dark">#0b2b4a</color>
+    <color name="secondary">#3a5a7a</color>
+    <color name="background">#f0f4f8</color>
+    <color name="surface">#ffffff</color>
+    <color name="success">#2b8c5e</color>
+    <color name="error">#b13e3e</color>
+    <color name="warning">#e6a020</color>
+    <color name="info">#1a7a8c</color>
+    <color name="level_debutant">#4CAF50</color>
+    <color name="level_intermediaire">#2196F3</color>
+    <color name="level_avance">#FF9800</color>
+    <color name="level_expert">#F44336</color>
+    <color name="level_maitre">#9C27B0</color>
+    <color name="dark_background">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+    <color name="dark_text">#FFFFFF</color>
+</resources>

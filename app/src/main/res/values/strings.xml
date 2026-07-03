@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PMP Master Pro</string>
+    <string name="app_description">Préparation certification PMP - 5000+ questions</string>
+    <string name="title_home">Accueil</string>
+    <string name="title_quiz">Quiz</string>
+    <string name="title_stats">Statistiques</string>
+    <string name="title_settings">Paramètres</string>
+    <string name="title_badges">Badges</string>
+    <string name="title_learn">Apprentissage</string>
+    <string name="msg_correct">Correct !</string>
+    <string name="msg_wrong">Incorrect</string>
+    <string name="msg_time_up">Temps écoulé !</string>
+    <string name="msg_excellent">Excellent !</string>
+    <string name="msg_good_work">Bon travail !</string>
+    <string name="msg_keep_going">Continuez vos efforts !</string>
+    <string name="level_debutant">Débutant</string>
+    <string name="level_intermediaire">Intermédiaire</string>
+    <string name="level_avance">Avancé</string>
+    <string name="level_expert">Expert</string>
+    <string name="level_maitre">Maître</string>
+</resources>
