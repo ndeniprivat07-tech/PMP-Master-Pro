@@ -312,7 +312,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Flashcards et Révision espacée"
+                        android:text="Niveaux, leçons audio et examens de passage"
                         android:textSize="13sp"
                         android:textColor="@color/secondary" />
                 </LinearLayout>
@@ -353,7 +353,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Révision du jour"
+                        android:text="Flashcards — Révision du jour"
                         android:textSize="18sp"
                         android:textColor="@color/warning"
                         android:textStyle="bold" />
@@ -421,7 +421,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="100% hors ligne - PMBOK 7e edition"
+            android:text="Préparation PMP - PMBOK 7e édition"
             android:textSize="12sp"
             android:textColor="@color/secondary"
             android:gravity="center"

@@ -84,29 +84,59 @@ public class ExamActivity extends AppCompatActivity {
         }
     }
 
+    /** Domaine ECO associé au sous-niveau, pour compléter avec la banque de questions */
+    private String ecoFromSubId(String id) {
+        if (id == null) return "process";
+        if (id.startsWith("1.2") || id.startsWith("3.1") || id.startsWith("3.2")
+                || id.startsWith("4.")) return "people";
+        return "process";
+    }
+
+    /** Questions de la banque correspondant au domaine du sous-niveau */
+    private List<ContentManager.QItem> bankPool(String domain) {
+        List<ContentManager.QItem> list = new ArrayList<>();
+        for (ContentManager.BankQ q : ContentManager.getBank(this)) {
+            if (q.domain.equals(domain)) list.add(q);
+        }
+        return list;
+    }
+
     private void loadQuestions() {
+        final int TAILLE_EXAMEN = 20;
         if ("examen_niveau".equals(type)) {
             ContentManager.Niveau niveau = ContentManager.findNiveau(this, niveauId);
             if (niveau == null) return;
             List<ContentManager.QItem> pool = new ArrayList<>();
-            for (ContentManager.SousNiveau s : niveau.sousNiveaux) pool.addAll(s.examen);
+            for (ContentManager.SousNiveau s : niveau.sousNiveaux) {
+                pool.addAll(s.examen);
+                pool.addAll(s.pratique);
+            }
             Collections.shuffle(pool);
-            int count = Math.min(15, pool.size());
+            int count = Math.min(TAILLE_EXAMEN, pool.size());
             questions = new ArrayList<>(pool.subList(0, count));
         } else {
             ContentManager.SousNiveau sub = ContentManager.findSousNiveau(this, subId);
             if (sub == null) return;
-            if ("pratique".equals(type)) {
-                questions = new ArrayList<>(sub.pratique);
-                Collections.shuffle(questions);
-            } else if ("comprehension".equals(type)) {
+            if ("comprehension".equals(type)) {
                 List<ContentManager.QItem> pool = new ArrayList<>(sub.pratique);
                 pool.addAll(sub.examen);
                 Collections.shuffle(pool);
                 int count = Math.min(5, pool.size());
                 questions = new ArrayList<>(pool.subList(0, count));
-            } else { // examen_sous
-                questions = new ArrayList<>(sub.examen);
+            } else { // pratique ET examen_sous : 20 questions
+                // Questions du sous-niveau d'abord, complétées par la banque du même domaine
+                List<ContentManager.QItem> propres = new ArrayList<>(sub.examen);
+                propres.addAll(sub.pratique);
+                Collections.shuffle(propres);
+                List<ContentManager.QItem> banque = bankPool(ecoFromSubId(sub.id));
+                Collections.shuffle(banque);
+                List<ContentManager.QItem> pool = new ArrayList<>(propres);
+                for (ContentManager.QItem q : banque) {
+                    if (pool.size() >= TAILLE_EXAMEN) break;
+                    pool.add(q);
+                }
+                int count = Math.min(TAILLE_EXAMEN, pool.size());
+                questions = new ArrayList<>(pool.subList(0, count));
                 Collections.shuffle(questions);
             }
         }
@@ -123,9 +153,14 @@ public class ExamActivity extends AppCompatActivity {
         progressBar.setProgress((currentIndex + 1) * 100 / questions.size());
 
         optionsContainer.removeAllViews();
-        for (int i = 0; i < q.options.length; i++) {
+        // Mélanger l'ordre des réponses : on ne peut pas mémoriser la position
+        List<Integer> ordre = new ArrayList<>();
+        for (int i = 0; i < q.options.length; i++) ordre.add(i);
+        Collections.shuffle(ordre);
+        for (int pos = 0; pos < ordre.size(); pos++) {
+            int i = ordre.get(pos); // index d'origine (porte la bonne réponse)
             Button btn = new Button(this);
-            btn.setText((char) ('A' + i) + ". " + q.options[i]);
+            btn.setText((char) ('A' + pos) + ". " + q.options[i]);
             btn.setTag(i);
             btn.setPadding(24, 16, 24, 16);
             btn.setTextSize(15);
@@ -158,9 +193,10 @@ public class ExamActivity extends AppCompatActivity {
         for (int i = 0; i < optionsContainer.getChildCount(); i++) {
             Button btn = (Button) optionsContainer.getChildAt(i);
             btn.setEnabled(false);
-            if (i == q.correct)
+            int original = (int) btn.getTag();
+            if (original == q.correct)
                 btn.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_green_light));
-            else if (i == selected)
+            else if (original == selected)
                 btn.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_light));
         }
 
