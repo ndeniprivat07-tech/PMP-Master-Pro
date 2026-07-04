@@ -113,7 +113,7 @@
                 android:text="Contenu"
                 android:textSize="16sp"
                 android:lineSpacingExtra="6dp"
-                android:textColor="#222222"
+                android:textColor="@color/text_main"
                 android:background="@color/surface"
                 android:padding="16dp"
                 android:layout_marginTop="2dp" />

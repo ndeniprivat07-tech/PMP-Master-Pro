@@ -137,8 +137,8 @@ public class LearnActivity extends AppCompatActivity {
         card.setLayoutParams(lp);
         card.setRadius(24);
         card.setCardElevation(enabled ? 6 : 1);
-        if (valide) card.setCardBackgroundColor(Color.parseColor("#e8f5ee"));
-        else if (!enabled) card.setCardBackgroundColor(Color.parseColor("#eeeeee"));
+        if (valide) card.setCardBackgroundColor(ContextCompat.getColor(this, R.color.card_ok));
+        else if (!enabled) card.setCardBackgroundColor(ContextCompat.getColor(this, R.color.card_locked));
 
         LinearLayout inner = new LinearLayout(this);
         inner.setOrientation(LinearLayout.VERTICAL);

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mode sombre : mêmes noms de couleurs, valeurs adaptées à la nuit -->
+    <color name="primary">#82b1d8</color>
+    <color name="primary_dark">#0b2b4a</color>
+    <color name="secondary">#9fb8cc</color>
+    <color name="background">#121212</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="success">#5ec78f</color>
+    <color name="error">#e07a7a</color>
+    <color name="warning">#f0b850</color>
+    <color name="info">#5bb8cc</color>
+
+    <color name="text_main">#e6e6e6</color>
+    <color name="journee_bg">#3a3320</color>
+    <color name="card_ok">#1e3328</color>
+    <color name="card_locked">#2a2a2a</color>
+</resources>

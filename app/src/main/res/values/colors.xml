@@ -17,4 +17,10 @@
     <color name="dark_background">#121212</color>
     <color name="dark_surface">#1E1E1E</color>
     <color name="dark_text">#FFFFFF</color>
+
+    <!-- Couleurs adaptatives jour/nuit -->
+    <color name="text_main">#222222</color>
+    <color name="journee_bg">#fff3d6</color>
+    <color name="card_ok">#e8f5ee</color>
+    <color name="card_locked">#eeeeee</color>
 </resources>
