@@ -63,7 +63,18 @@ public class CalcActivity extends AppCompatActivity {
             showNext();
         });
 
-        choisirCategorie();
+        // Reprendre la dernière catégorie choisie ; dialogue seulement à la première utilisation
+        String savedCat = getSharedPreferences("parametres", MODE_PRIVATE)
+                .getString("calc_categorie", null);
+        if (savedCat != null) {
+            categorie = savedCat;
+            for (int i = 0; i < CAT_VALUES.length; i++) {
+                if (CAT_VALUES[i].equals(categorie)) tvMode.setText(CAT_LABELS[i] + "  ▾");
+            }
+            showNext();
+        } else {
+            choisirCategorie();
+        }
     }
 
     /** L'utilisateur choisit le type de calculs qu'il veut travailler */
@@ -78,6 +89,8 @@ public class CalcActivity extends AppCompatActivity {
                     int pos = ((android.app.AlertDialog) d).getListView().getCheckedItemPosition();
                     categorie = CAT_VALUES[pos >= 0 ? pos : 5];
                     tvMode.setText(CAT_LABELS[pos >= 0 ? pos : 5] + "  ▾");
+                    getSharedPreferences("parametres", MODE_PRIVATE)
+                            .edit().putString("calc_categorie", categorie).apply();
                     showNext();
                 })
                 .show();
@@ -137,6 +150,6 @@ public class CalcActivity extends AppCompatActivity {
         tvProgress.setText(repondues + " faites — " + taux + "%");
         btnNext.setEnabled(true);
 
-        new ProgressManager(this).recordStudy();
+        new ProgressManager(this).recordQuestion(correct);
     }
 }

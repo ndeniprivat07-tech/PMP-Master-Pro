@@ -182,6 +182,7 @@ public class ExamActivity extends AppCompatActivity {
         answered = true;
         ContentManager.QItem q = questions.get(currentIndex);
         boolean correct = selected == q.correct;
+        progress.recordQuestion(correct);
         if (correct) {
             score++;
         } else {

@@ -121,6 +121,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void choisirHeureRappel() {
+        // Android 13+ : demander la permission d'afficher des notifications
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                        != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+        }
         int heure = prefs.getInt("rappel_heure", 19);
         int minute = prefs.getInt("rappel_minute", 0);
         new TimePickerDialog(this, (view, h, m) -> {

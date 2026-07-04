@@ -41,16 +41,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadStats() {
-        int[] stats = dbHelper.getStats();
-        int total = stats[0];
-        int correct = stats[1];
+        // Métriques unifiées : toutes les activités comptent (parcours, entraînement, révision, calculs)
+        ProgressManager pm = new ProgressManager(this);
+        int total = pm.getTotalQuestions();
+        int correct = pm.getTotalCorrect();
 
         tvQuestionsAnswered.setText(String.valueOf(total));
         int successRate = total > 0 ? (correct * 100) / total : 0;
         tvSuccessRate.setText(successRate + "%");
-
-        // Progression = avancement réel dans le parcours d'apprentissage
-        ProgressManager pm = new ProgressManager(this);
         int totalSubs = 0, valides = 0;
         for (com.pmp.quiz.learn.ContentManager.Niveau n :
                 com.pmp.quiz.learn.ContentManager.getNiveaux(this)) {
@@ -106,6 +104,36 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         loadStats();
         updateReviewBadge();
+        updateJournee();
+    }
+
+    /** Bandeau directif : dit à l'utilisateur QUOI faire aujourd'hui */
+    private void updateJournee() {
+        android.widget.TextView tvJournee = findViewById(R.id.tvJournee);
+        ProgressManager pm = new ProgressManager(this);
+        android.content.SharedPreferences params = getSharedPreferences("parametres", MODE_PRIVATE);
+
+        StringBuilder sb = new StringBuilder("📋 AUJOURD'HUI");
+
+        // Compte à rebours de l'examen
+        long dateExamen = params.getLong("date_examen", 0);
+        if (dateExamen > 0) {
+            long jours = (dateExamen - System.currentTimeMillis()) / (24L * 3600 * 1000);
+            if (jours >= 0) sb.append("  •  🎯 J-").append(jours);
+        }
+
+        // Objectif quotidien mesuré
+        int objectif = params.getInt("objectif_quotidien", 20);
+        int faites = pm.getTodayCount();
+        sb.append("\n🏋️ Objectif : ").append(faites).append("/").append(objectif).append(" questions");
+        if (faites >= objectif) sb.append(" ✅ atteint, bravo !");
+        else sb.append(" — encore ").append(objectif - faites);
+
+        // Révisions dues
+        int due = new ReviewManager(this).getDueCount();
+        if (due > 0) sb.append("\n🔁 ").append(due).append(" question(s) à réviser en priorité");
+
+        tvJournee.setText(sb.toString());
     }
 
     /** Compteur de révision : incite l'utilisateur à s'exercer chaque jour */

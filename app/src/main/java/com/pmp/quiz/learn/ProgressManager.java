@@ -188,6 +188,31 @@ public class ProgressManager {
         prefs.edit().putInt("streak_last_day", today).putInt("streak_count", streak).apply();
     }
 
+    // ===== Compteur de questions (toutes activités confondues) =====
+
+    /** Enregistre une question répondue — alimente l'objectif quotidien et les statistiques globales */
+    public void recordQuestion(boolean correct) {
+        recordStudy();
+        int today = dayNumber();
+        prefs.edit()
+                .putInt("q_day_" + today, prefs.getInt("q_day_" + today, 0) + 1)
+                .putInt("q_total", prefs.getInt("q_total", 0) + 1)
+                .putInt("q_correct", prefs.getInt("q_correct", 0) + (correct ? 1 : 0))
+                .apply();
+    }
+
+    public int getTodayCount() {
+        return prefs.getInt("q_day_" + dayNumber(), 0);
+    }
+
+    public int getTotalQuestions() {
+        return prefs.getInt("q_total", 0);
+    }
+
+    public int getTotalCorrect() {
+        return prefs.getInt("q_correct", 0);
+    }
+
     public int getStreak() {
         int today = dayNumber();
         int lastDay = prefs.getInt("streak_last_day", 0);

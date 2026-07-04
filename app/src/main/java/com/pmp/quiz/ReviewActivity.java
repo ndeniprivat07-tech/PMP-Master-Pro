@@ -113,6 +113,7 @@ public class ReviewActivity extends AppCompatActivity {
         answered = true;
         ReviewManager.ReviewItem item = items.get(currentIndex);
         boolean correct = selected == item.correct;
+        progress.recordQuestion(correct);
 
         if (correct) {
             score++;

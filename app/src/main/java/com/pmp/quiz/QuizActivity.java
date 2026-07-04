@@ -310,6 +310,7 @@ public class QuizActivity extends AppCompatActivity {
         Question q = questions.get(currentIndex);
         boolean isCorrect = selected == q.getCorrectIndex();
 
+        new com.pmp.quiz.learn.ProgressManager(this).recordQuestion(isCorrect);
         if (isCorrect) {
             score++;
         } else {
