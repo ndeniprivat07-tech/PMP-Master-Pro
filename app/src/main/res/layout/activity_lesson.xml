@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&lt;"
+            android:background="@android:color/transparent"
+            android:textColor="@color/primary"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvLessonTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Leçon"
+            android:textSize="17sp"
+            android:textColor="@color/primary"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <Button
+                android:id="@+id/btnAudio"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="🔊 Écouter la leçon"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/info" />
+
+            <TextView
+                android:id="@+id/tvLessonContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Contenu de la leçon"
+                android:textSize="16sp"
+                android:lineSpacingExtra="6dp"
+                android:textColor="#222222"
+                android:background="@color/surface"
+                android:padding="20dp"
+                android:layout_marginTop="12dp" />
+
+            <Button
+                android:id="@+id/btnLeconLue"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="✅ J'ai lu la leçon"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/success"
+                android:layout_marginTop="12dp" />
+
+            <Button
+                android:id="@+id/btnPratique"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="🏋️ Exercices de pratique (illimités)"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/secondary"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/btnComprehension"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="📚 Test de compréhension (80%)"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/warning"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnExamen"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="🎓 Passer l'examen (80% requis)"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/primary"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/tvExamenInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="13sp"
+                android:textColor="@color/error"
+                android:gravity="center"
+                android:padding="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

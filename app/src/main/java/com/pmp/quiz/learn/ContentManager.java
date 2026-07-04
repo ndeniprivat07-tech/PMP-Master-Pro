@@ -1,0 +1,108 @@
+package com.pmp.quiz.learn;
+
+import android.content.Context;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ContentManager {
+
+    public static class QItem {
+        public String q;
+        public String[] options;
+        public int correct;
+        public String explication;
+    }
+
+    public static class SousNiveau {
+        public String id;
+        public String titre;
+        public String lecon;
+        public List<QItem> pratique = new ArrayList<>();
+        public List<QItem> examen = new ArrayList<>();
+    }
+
+    public static class Niveau {
+        public int id;
+        public String titre;
+        public String emoji;
+        public List<SousNiveau> sousNiveaux = new ArrayList<>();
+    }
+
+    private static List<Niveau> cache;
+
+    public static List<Niveau> getNiveaux(Context ctx) {
+        if (cache != null) return cache;
+        List<Niveau> niveaux = new ArrayList<>();
+        try {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    ctx.getAssets().open("content.json"), StandardCharsets.UTF_8));
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+            reader.close();
+
+            JSONObject root = new JSONObject(sb.toString());
+            JSONArray arr = root.getJSONArray("niveaux");
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject n = arr.getJSONObject(i);
+                Niveau niveau = new Niveau();
+                niveau.id = n.getInt("id");
+                niveau.titre = n.getString("titre");
+                niveau.emoji = n.optString("emoji", "");
+                JSONArray subs = n.getJSONArray("sousNiveaux");
+                for (int j = 0; j < subs.length(); j++) {
+                    JSONObject s = subs.getJSONObject(j);
+                    SousNiveau sub = new SousNiveau();
+                    sub.id = s.getString("id");
+                    sub.titre = s.getString("titre");
+                    sub.lecon = s.getString("lecon");
+                    sub.pratique = parseQuestions(s.getJSONArray("pratique"));
+                    sub.examen = parseQuestions(s.getJSONArray("examen"));
+                    niveau.sousNiveaux.add(sub);
+                }
+                niveaux.add(niveau);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        cache = niveaux;
+        return niveaux;
+    }
+
+    private static List<QItem> parseQuestions(JSONArray arr) throws Exception {
+        List<QItem> list = new ArrayList<>();
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject o = arr.getJSONObject(i);
+            QItem q = new QItem();
+            q.q = o.getString("q");
+            JSONArray opts = o.getJSONArray("o");
+            q.options = new String[opts.length()];
+            for (int k = 0; k < opts.length(); k++) q.options[k] = opts.getString(k);
+            q.correct = o.getInt("c");
+            q.explication = o.getString("e");
+            list.add(q);
+        }
+        return list;
+    }
+
+    public static SousNiveau findSousNiveau(Context ctx, String subId) {
+        for (Niveau n : getNiveaux(ctx)) {
+            for (SousNiveau s : n.sousNiveaux) {
+                if (s.id.equals(subId)) return s;
+            }
+        }
+        return null;
+    }
+
+    public static Niveau findNiveau(Context ctx, int niveauId) {
+        for (Niveau n : getNiveaux(ctx)) {
+            if (n.id == niveauId) return n;
+        }
+        return null;
+    }
+}

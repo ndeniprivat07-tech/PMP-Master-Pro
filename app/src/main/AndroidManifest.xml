@@ -38,6 +38,18 @@
             android:name=".StatsActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".LearnActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".LessonActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ExamActivity"
+            android:screenOrientation="portrait" />
+
         <receiver
             android:name=".services.NotificationReceiver"
             android:exported="false" />

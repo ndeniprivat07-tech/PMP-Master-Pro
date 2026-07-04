@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import com.pmp.quiz.database.DatabaseHelper;
+import com.pmp.quiz.learn.ProgressManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
         else level = "Maître";
         tvLevel.setText(level);
 
-        tvStreak.setText((total / 10) + " jours");
+        int streak = new ProgressManager(this).getStreak();
+        tvStreak.setText("🔥 " + streak + (streak > 1 ? " jours" : " jour"));
     }
 
     private void setupClickListeners() {
@@ -75,9 +77,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        cardLearn.setOnClickListener(v -> {
-            Toast.makeText(this, "Mode Apprentissage - Flashcards", Toast.LENGTH_SHORT).show();
-        });
+        cardLearn.setOnClickListener(v -> startActivity(new Intent(this, LearnActivity.class)));
 
         cardStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
         btnStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
