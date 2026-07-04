@@ -127,10 +127,20 @@ public class QuizActivity extends AppCompatActivity {
         return "process";
     }
 
+    private final java.util.HashSet<Integer> pausesProposees = new java.util.HashSet<>();
+
     private void showQuestion() {
         if (currentIndex >= questions.size()) {
             finishQuiz();
             return;
+        }
+
+        // Pauses réalistes du vrai examen PMP : après Q60 et Q120 (chrono suspendu)
+        if ("examen".equals(mode) && questions.size() >= 120
+                && (currentIndex == 60 || currentIndex == 120)
+                && !pausesProposees.contains(currentIndex)) {
+            pausesProposees.add(currentIndex);
+            proposerPause();
         }
 
         Question q = questions.get(currentIndex);
@@ -203,6 +213,40 @@ public class QuizActivity extends AppCompatActivity {
         tvFeedback.setVisibility(View.VISIBLE);
         tvScore.setText("Score: " + score);
         btnNext.setEnabled(true);
+    }
+
+    /**
+     * Pause de 10 minutes comme au vrai examen PMP (après Q60 et Q120).
+     * Le chrono principal est suspendu ; on ne peut pas revenir aux questions précédentes.
+     */
+    private void proposerPause() {
+        if (timer != null) timer.cancel(); // suspendre le chrono principal
+
+        final android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(this)
+                .setTitle("☕ Pause officielle — 10 minutes")
+                .setMessage("Comme au vrai examen PMP :\n\n• Pause de 10 minutes (chrono suspendu)\n• Vous ne pourrez PAS revenir aux questions précédentes\n• Levez-vous, hydratez-vous, respirez !\n\nTemps restant : 10:00")
+                .setCancelable(false)
+                .setPositiveButton("▶️ Reprendre l'examen", null)
+                .create();
+        dialog.show();
+
+        final CountDownTimer pauseTimer = new CountDownTimer(10 * 60 * 1000, 1000) {
+            public void onTick(long ms) {
+                long m = ms / 60000, s = (ms % 60000) / 1000;
+                dialog.setMessage("Comme au vrai examen PMP :\n\n• Pause de 10 minutes (chrono suspendu)\n• Vous ne pourrez PAS revenir aux questions précédentes\n• Levez-vous, hydratez-vous, respirez !\n\nTemps restant : "
+                        + String.format("%02d:%02d", m, s));
+            }
+            public void onFinish() {
+                if (dialog.isShowing()) dialog.dismiss();
+                if (timeLeft > 0) startTimer((int) timeLeft); // reprendre le chrono
+            }
+        }.start();
+
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            pauseTimer.cancel();
+            dialog.dismiss();
+            if (timeLeft > 0) startTimer((int) timeLeft); // reprendre le chrono
+        });
     }
 
     private void startTimer(int seconds) {
