@@ -15,20 +15,57 @@ public class CalcGenerator {
 
     private static final Random rnd = new Random();
 
+    /** Catégories disponibles pour le choix de l'utilisateur */
+    public static final String CAT_ECONOMIE = "economie";
+    public static final String CAT_PLANNING = "planning";
+    public static final String CAT_DECISION = "decision";
+    public static final String CAT_ESTIMATION = "estimation";
+    public static final String CAT_COMMUNICATION = "communication";
+    public static final String CAT_TOUT = "tout";
+
     public static ContentManager.QItem next() {
-        switch (rnd.nextInt(12)) {
-            case 0: return genCPI();
-            case 1: return genSPI();
-            case 2: return genEAC();
-            case 3: return genCV();
-            case 4: return genPERT();
-            case 5: return genCanaux();
-            case 6: return genEMV();
-            case 7: return genTCPI();
-            case 8: return genCheminCritique();
-            case 9: return genMargeTotale();
-            case 10: return genLag();
-            default: return genMargeImpact();
+        return next(CAT_TOUT);
+    }
+
+    public static ContentManager.QItem next(String categorie) {
+        switch (categorie) {
+            case CAT_ECONOMIE:
+                switch (rnd.nextInt(5)) {
+                    case 0: return genCPI();
+                    case 1: return genSPI();
+                    case 2: return genEAC();
+                    case 3: return genCV();
+                    default: return genTCPI();
+                }
+            case CAT_PLANNING:
+                switch (rnd.nextInt(4)) {
+                    case 0: return genCheminCritique();
+                    case 1: return genMargeTotale();
+                    case 2: return genLag();
+                    default: return genMargeImpact();
+                }
+            case CAT_DECISION:
+                return rnd.nextBoolean() ? genEMV() : genArbreDecision();
+            case CAT_ESTIMATION:
+                return genPERT();
+            case CAT_COMMUNICATION:
+                return genCanaux();
+            default: // tout mélangé
+                switch (rnd.nextInt(13)) {
+                    case 0: return genCPI();
+                    case 1: return genSPI();
+                    case 2: return genEAC();
+                    case 3: return genCV();
+                    case 4: return genPERT();
+                    case 5: return genCanaux();
+                    case 6: return genEMV();
+                    case 7: return genTCPI();
+                    case 8: return genCheminCritique();
+                    case 9: return genMargeTotale();
+                    case 10: return genLag();
+                    case 11: return genArbreDecision();
+                    default: return genMargeImpact();
+                }
         }
     }
 
@@ -179,6 +216,34 @@ public class CalcGenerator {
 
     private static double round2(double v) {
         return Math.round(v * 100.0) / 100.0;
+    }
+
+    /** Arbre de décision : choisir entre deux options par leur coût total attendu */
+    private static ContentManager.QItem genArbreDecision() {
+        int coutA = (3 + rnd.nextInt(5)) * 10;         // 30..70 k€
+        int probaA = (2 + rnd.nextInt(4)) * 10;        // 20..50 %
+        int impactA = (4 + rnd.nextInt(6)) * 10;       // 40..90 k€
+        double totalA = coutA + probaA / 100.0 * impactA;
+
+        int coutB = (int) totalA + (rnd.nextBoolean() ? 1 : -1) * (5 + rnd.nextInt(15));
+        if (coutB <= 0) coutB = (int) totalA + 10;
+        double totalB = coutB; // option B sûre, sans risque
+
+        String bonne = totalA < totalB ? "Option A" : "Option B";
+        ContentManager.QItem item = new ContentManager.QItem();
+        item.q = "Arbre de décision — Option A : coût " + coutA + " k€ avec " + probaA
+                + "% de risque d'un surcoût de " + impactA + " k€. Option B : coût fixe garanti de "
+                + coutB + " k€, sans risque. Quelle option choisir sur la base du coût total attendu ?";
+        item.options = new String[]{
+                "Option A",
+                "Option B",
+                "Les deux options sont équivalentes",
+                "Impossible à déterminer sans plus d'informations"};
+        item.correct = bonne.equals("Option A") ? 0 : 1;
+        item.explication = "Coût attendu A = " + coutA + " + (" + (probaA / 100.0) + " × " + impactA
+                + ") = " + fmt(totalA) + " k€. Coût attendu B = " + coutB + " k€. Le plus faible gagne : "
+                + bonne + ". C'est le principe de l'arbre de décision : coût + EMV des risques de chaque branche.";
+        return item;
     }
 
     // ===== QCM DE PLANNING / ORDONNANCEMENT =====

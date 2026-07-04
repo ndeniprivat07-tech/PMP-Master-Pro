@@ -22,6 +22,18 @@ public class CalcActivity extends AppCompatActivity {
     private int repondues = 0;
     private int correctes = 0;
     private boolean answered = false;
+    private String categorie = CalcGenerator.CAT_TOUT;
+
+    private static final String[] CAT_LABELS = {
+            "💰 Économie / Coûts (CPI, SPI, EAC...)",
+            "📅 Planning (chemin critique, marges, lag)",
+            "⚖️ Risques et Décision (EMV, arbres de décision)",
+            "⏱️ Estimations (PERT)",
+            "📞 Communication (canaux)",
+            "🎲 Tout mélangé"};
+    private static final String[] CAT_VALUES = {
+            CalcGenerator.CAT_ECONOMIE, CalcGenerator.CAT_PLANNING, CalcGenerator.CAT_DECISION,
+            CalcGenerator.CAT_ESTIMATION, CalcGenerator.CAT_COMMUNICATION, CalcGenerator.CAT_TOUT};
 
     private TextView tvQuestion, tvProgress, tvFeedback, tvMode;
     private LinearLayout optionsContainer;
@@ -41,20 +53,38 @@ public class CalcActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         progressBar = findViewById(R.id.progressBar);
 
-        tvMode.setText("🧮 Calculs illimités");
         progressBar.setVisibility(View.GONE);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        // Toucher le titre permet de changer de catégorie en cours de session
+        tvMode.setOnClickListener(v -> choisirCategorie());
 
         btnNext.setOnClickListener(v -> {
             if (!answered) return;
             showNext();
         });
 
-        showNext();
+        choisirCategorie();
+    }
+
+    /** L'utilisateur choisit le type de calculs qu'il veut travailler */
+    private void choisirCategorie() {
+        int checked = 5;
+        for (int i = 0; i < CAT_VALUES.length; i++) if (CAT_VALUES[i].equals(categorie)) checked = i;
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("🧮 Quel type de calculs ?")
+                .setCancelable(false)
+                .setSingleChoiceItems(CAT_LABELS, checked, null)
+                .setPositiveButton("Commencer", (d, w) -> {
+                    int pos = ((android.app.AlertDialog) d).getListView().getCheckedItemPosition();
+                    categorie = CAT_VALUES[pos >= 0 ? pos : 5];
+                    tvMode.setText(CAT_LABELS[pos >= 0 ? pos : 5] + "  ▾");
+                    showNext();
+                })
+                .show();
     }
 
     private void showNext() {
-        current = CalcGenerator.next();
+        current = CalcGenerator.next(categorie);
         tvQuestion.setText(current.q);
         int taux = repondues > 0 ? (correctes * 100) / repondues : 0;
         tvProgress.setText(repondues + " faites" + (repondues > 0 ? " — " + taux + "%" : ""));
