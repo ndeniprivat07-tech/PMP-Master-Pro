@@ -49,6 +49,28 @@ public class QuizActivity extends AppCompatActivity {
         mode = getIntent().getStringExtra("mode");
         if (mode == null) mode = "entrainement";
 
+        setupClickListeners();
+
+        // Reprise de session : un examen interrompu n'est pas perdu
+        android.content.SharedPreferences sess = getSharedPreferences("quiz_session", MODE_PRIVATE);
+        String saved = sess.getString("state", null);
+        if (saved != null) {
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("⏸️ Session interrompue trouvée")
+                    .setMessage("Vous avez un quiz/examen en cours non terminé. Voulez-vous le reprendre là où vous vous étiez arrêté ?")
+                    .setCancelable(false)
+                    .setPositiveButton("▶️ Reprendre", (d, w) -> restoreSession(saved))
+                    .setNegativeButton("🗑️ Recommencer", (d, w) -> {
+                        clearSession();
+                        startFresh();
+                    })
+                    .show();
+        } else {
+            startFresh();
+        }
+    }
+
+    private void startFresh() {
         loadQuestions();
 
         if ("examen".equals(mode)) {
@@ -60,7 +82,87 @@ public class QuizActivity extends AppCompatActivity {
         }
 
         showQuestion();
-        setupClickListeners();
+    }
+
+    // ===== Sauvegarde / reprise de session =====
+
+    private void saveSession() {
+        try {
+            org.json.JSONObject state = new org.json.JSONObject();
+            state.put("mode", mode);
+            state.put("index", currentIndex);
+            state.put("score", score);
+            state.put("timeLeft", timeLeft);
+            org.json.JSONArray arr = new org.json.JSONArray();
+            for (Question q : questions) {
+                org.json.JSONObject o = new org.json.JSONObject();
+                o.put("q", q.getQuestion());
+                org.json.JSONArray opts = new org.json.JSONArray();
+                for (String s : q.getOptions()) opts.put(s);
+                o.put("o", opts);
+                o.put("c", q.getCorrectIndex());
+                o.put("e", q.getExplication() == null ? "" : q.getExplication());
+                String eco = ecoMap.get(q.getId());
+                o.put("d", eco == null ? "process" : eco);
+                arr.put(o);
+            }
+            state.put("questions", arr);
+            org.json.JSONObject ecoC = new org.json.JSONObject();
+            for (java.util.Map.Entry<String, Integer> e : ecoCorrect.entrySet()) ecoC.put(e.getKey(), e.getValue());
+            state.put("ecoCorrect", ecoC);
+            org.json.JSONObject ecoT = new org.json.JSONObject();
+            for (java.util.Map.Entry<String, Integer> e : ecoTotal.entrySet()) ecoT.put(e.getKey(), e.getValue());
+            state.put("ecoTotal", ecoT);
+            getSharedPreferences("quiz_session", MODE_PRIVATE)
+                    .edit().putString("state", state.toString()).apply();
+        } catch (Exception ignored) {}
+    }
+
+    private void restoreSession(String saved) {
+        try {
+            org.json.JSONObject state = new org.json.JSONObject(saved);
+            mode = state.getString("mode");
+            currentIndex = state.getInt("index");
+            score = state.getInt("score");
+            timeLeft = state.getLong("timeLeft");
+            questions = new ArrayList<>();
+            org.json.JSONArray arr = state.getJSONArray("questions");
+            for (int i = 0; i < arr.length(); i++) {
+                org.json.JSONObject o = arr.getJSONObject(i);
+                org.json.JSONArray opts = o.getJSONArray("o");
+                questions.add(new Question(300000 + i, "reprise", "reprise", "",
+                        o.getString("q"), opts.getString(0), opts.getString(1),
+                        opts.getString(2), opts.getString(3), o.getInt("c"),
+                        o.getString("e"), "", "", 60, 2));
+                ecoMap.put(300000 + i, o.optString("d", "process"));
+            }
+            org.json.JSONObject ecoC = state.getJSONObject("ecoCorrect");
+            java.util.Iterator<String> it = ecoC.keys();
+            while (it.hasNext()) { String k = it.next(); ecoCorrect.put(k, ecoC.getInt(k)); }
+            org.json.JSONObject ecoT = state.getJSONObject("ecoTotal");
+            it = ecoT.keys();
+            while (it.hasNext()) { String k = it.next(); ecoTotal.put(k, ecoT.getInt(k)); }
+
+            if ("examen".equals(mode)) {
+                tvLevel.setText("Examen Réel PMP");
+                if (timeLeft > 0) {
+                    startTimer((int) timeLeft);
+                    tvTimer.setVisibility(View.VISIBLE);
+                }
+                if (currentIndex > 60) pausesProposees.add(60);
+                if (currentIndex > 120) pausesProposees.add(120);
+            } else {
+                tvLevel.setText("Entraînement");
+            }
+            showQuestion();
+        } catch (Exception e) {
+            clearSession();
+            startFresh();
+        }
+    }
+
+    private void clearSession() {
+        getSharedPreferences("quiz_session", MODE_PRIVATE).edit().remove("state").apply();
     }
 
     private void initViews() {
@@ -269,6 +371,7 @@ public class QuizActivity extends AppCompatActivity {
                 return;
             }
             currentIndex++;
+            saveSession(); // la progression est conservée en cas d'interruption
             showQuestion();
         });
 
@@ -289,6 +392,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void finishQuiz() {
+        clearSession();
         if (timer != null) timer.cancel();
         Intent intent = new Intent(this, ResultActivity.class);
         intent.putExtra("score", score);
