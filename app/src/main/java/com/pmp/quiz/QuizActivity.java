@@ -74,6 +74,20 @@ public class QuizActivity extends AppCompatActivity {
 
     private void loadQuestions() {
         List<Question> all = dbHelper.getAllQuestions();
+        // Ajouter toutes les questions du parcours d'apprentissage (content.json)
+        int syntheticId = 100000;
+        for (com.pmp.quiz.learn.ContentManager.Niveau niveau :
+                com.pmp.quiz.learn.ContentManager.getNiveaux(this)) {
+            for (com.pmp.quiz.learn.ContentManager.SousNiveau sub : niveau.sousNiveaux) {
+                List<com.pmp.quiz.learn.ContentManager.QItem> pool = new ArrayList<>(sub.pratique);
+                pool.addAll(sub.examen);
+                for (com.pmp.quiz.learn.ContentManager.QItem q : pool) {
+                    all.add(new Question(syntheticId++, niveau.titre, "parcours", sub.titre,
+                            q.q, q.options[0], q.options[1], q.options[2], q.options[3],
+                            q.correct, q.explication, sub.id + " — " + sub.titre, "", 60, 2));
+                }
+            }
+        }
         Collections.shuffle(all);
         int limit = "examen".equals(mode) ? 180 : 20;
         questions = all.size() > limit ? new ArrayList<>(all.subList(0, limit)) : all;
