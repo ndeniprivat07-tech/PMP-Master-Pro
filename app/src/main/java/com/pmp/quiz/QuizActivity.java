@@ -210,7 +210,33 @@ public class QuizActivity extends AppCompatActivity {
 
         Collections.shuffle(all);
         int limit = "examen".equals(mode) ? 180 : 20;
-        questions = all.size() > limit ? new ArrayList<>(all.subList(0, limit)) : all;
+
+        if ("examen".equals(mode)) {
+            // Anti-répétition : privilégier les questions jamais vues dans les examens précédents
+            java.util.Set<String> dejaVues = getSharedPreferences("examens_blancs", MODE_PRIVATE)
+                    .getStringSet("questions_vues", new java.util.HashSet<>());
+            List<Question> nouvelles = new ArrayList<>();
+            List<Question> vues = new ArrayList<>();
+            for (Question q : all) {
+                if (dejaVues.contains(String.valueOf(q.getQuestion().hashCode()))) vues.add(q);
+                else nouvelles.add(q);
+            }
+            List<Question> ordered = new ArrayList<>(nouvelles);
+            ordered.addAll(vues); // les vues ne servent qu'en complément
+            questions = ordered.size() > limit ? new ArrayList<>(ordered.subList(0, limit)) : ordered;
+            Collections.shuffle(questions);
+        } else {
+            questions = all.size() > limit ? new ArrayList<>(all.subList(0, limit)) : all;
+        }
+    }
+
+    /** Mémorise les questions utilisées dans cet examen blanc (anti-répétition) */
+    private void marquerQuestionsVues() {
+        android.content.SharedPreferences prefs = getSharedPreferences("examens_blancs", MODE_PRIVATE);
+        java.util.Set<String> vues = new java.util.HashSet<>(
+                prefs.getStringSet("questions_vues", new java.util.HashSet<>()));
+        for (Question q : questions) vues.add(String.valueOf(q.getQuestion().hashCode()));
+        prefs.edit().putStringSet("questions_vues", vues).apply();
     }
 
     /** Domaine ECO à partir du domaine d'une question de la base */
@@ -393,6 +419,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void finishQuiz() {
         clearSession();
+        if ("examen".equals(mode)) marquerQuestionsVues();
         if (timer != null) timer.cancel();
         Intent intent = new Intent(this, ResultActivity.class);
         intent.putExtra("score", score);
