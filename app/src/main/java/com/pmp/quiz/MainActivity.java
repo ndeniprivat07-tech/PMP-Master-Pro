@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseHelper dbHelper;
     private TextView tvProgress, tvLevel, tvQuestionsAnswered, tvSuccessRate, tvStreak;
     private CardView cardTraining, cardExam, cardLearn, cardStats;
-    private Button btnStats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         cardExam = findViewById(R.id.cardExam);
         cardLearn = findViewById(R.id.cardLearn);
         cardStats = findViewById(R.id.cardStats);
-        btnStats = findViewById(R.id.btnStats);
     }
 
     private void loadStats() {
@@ -101,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class)));
 
         cardStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
-        btnStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
     }
 
     @Override
