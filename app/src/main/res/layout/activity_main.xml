@@ -34,7 +34,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Préparation PMP - 5000+ questions"
+                    android:text="Préparation certification PMP"
                     android:textSize="13sp"
                     android:textColor="@color/secondary" />
             </LinearLayout>
@@ -46,6 +46,14 @@
                 android:text="Stats"
                 android:background="@android:color/transparent"
                 android:textColor="@color/primary" />
+
+            <Button
+                android:id="@+id/btnSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚙️"
+                android:textSize="20sp"
+                android:background="@android:color/transparent" />
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
@@ -313,6 +321,55 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Niveaux, leçons audio et examens de passage"
+                        android:textSize="13sp"
+                        android:textColor="@color/secondary" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardCalc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="12dp"
+            android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🧮"
+                    android:textSize="32sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Calculs illimités"
+                        android:textSize="18sp"
+                        android:textColor="@color/info"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EVM, PERT, EMV... jamais deux fois la même"
                         android:textSize="13sp"
                         android:textColor="@color/secondary" />
                 </LinearLayout>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&lt;"
+            android:background="@android:color/transparent"
+            android:textColor="@color/primary"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⚙️ Paramètres"
+            android:textSize="20sp"
+            android:textColor="@color/primary"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎯 MON OBJECTIF"
+                android:textSize="13sp"
+                android:textColor="@color/secondary"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+
+            <LinearLayout
+                android:id="@+id/rowDateExamen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/surface"
+                android:padding="16dp"
+                android:layout_marginTop="6dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📅 Date d'examen visée" android:textSize="16sp" android:textColor="@color/primary" android:textStyle="bold" />
+                <TextView android:id="@+id/tvDateExamen" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Non définie" android:textSize="13sp" android:textColor="@color/secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rowObjectif"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/surface"
+                android:padding="16dp"
+                android:layout_marginTop="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🏋️ Objectif quotidien" android:textSize="16sp" android:textColor="@color/primary" android:textStyle="bold" />
+                <TextView android:id="@+id/tvObjectif" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="20 questions par jour" android:textSize="13sp" android:textColor="@color/secondary" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔔 NOTIFICATIONS"
+                android:textSize="13sp"
+                android:textColor="@color/secondary"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp" />
+
+            <LinearLayout
+                android:id="@+id/rowRappel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/surface"
+                android:padding="16dp"
+                android:layout_marginTop="6dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="⏰ Rappel quotidien d'étude" android:textSize="16sp" android:textColor="@color/primary" android:textStyle="bold" />
+                <TextView android:id="@+id/tvRappel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Désactivé" android:textSize="13sp" android:textColor="@color/secondary" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔊 AUDIO DES LEÇONS"
+                android:textSize="13sp"
+                android:textColor="@color/secondary"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp" />
+
+            <LinearLayout
+                android:id="@+id/rowVitesse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/surface"
+                android:padding="16dp"
+                android:layout_marginTop="6dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="⏩ Vitesse de lecture" android:textSize="16sp" android:textColor="@color/primary" android:textStyle="bold" />
+                <TextView android:id="@+id/tvVitesse" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="1x" android:textSize="13sp" android:textColor="@color/secondary" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Le choix de la voix se fait dans une leçon (bouton 🎙️ Voix)" android:textSize="11sp" android:textColor="@color/secondary" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💾 MES DONNÉES"
+                android:textSize="13sp"
+                android:textColor="@color/secondary"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp" />
+
+            <LinearLayout
+                android:id="@+id/rowReset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/surface"
+                android:padding="16dp"
+                android:layout_marginTop="6dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🗑️ Réinitialiser la progression" android:textSize="16sp" android:textColor="@color/error" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Efface tout : parcours, révisions, historique" android:textSize="13sp" android:textColor="@color/secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rowAPropos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/surface"
+                android:padding="16dp"
+                android:layout_marginTop="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="ℹ️ À propos" android:textSize="16sp" android:textColor="@color/primary" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Version, nombre de questions, sources" android:textSize="13sp" android:textColor="@color/secondary" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

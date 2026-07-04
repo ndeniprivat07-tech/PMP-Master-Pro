@@ -56,6 +56,14 @@
             android:name=".ReviewActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".CalcActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait" />
+
         <receiver
             android:name=".services.NotificationReceiver"
             android:exported="false" />

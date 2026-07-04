@@ -50,7 +50,18 @@ public class MainActivity extends AppCompatActivity {
         tvQuestionsAnswered.setText(String.valueOf(total));
         int successRate = total > 0 ? (correct * 100) / total : 0;
         tvSuccessRate.setText(successRate + "%");
-        int progress = (total * 100) / 5000;
+
+        // Progression = avancement réel dans le parcours d'apprentissage
+        ProgressManager pm = new ProgressManager(this);
+        int totalSubs = 0, valides = 0;
+        for (com.pmp.quiz.learn.ContentManager.Niveau n :
+                com.pmp.quiz.learn.ContentManager.getNiveaux(this)) {
+            for (com.pmp.quiz.learn.ContentManager.SousNiveau s : n.sousNiveaux) {
+                totalSubs++;
+                if (pm.isSousNiveauValide(s.id)) valides++;
+            }
+        }
+        int progress = totalSubs > 0 ? (valides * 100) / totalSubs : 0;
         tvProgress.setText(progress + "%");
 
         String level;
@@ -82,6 +93,12 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.cardReview).setOnClickListener(v ->
                 startActivity(new Intent(this, ReviewActivity.class)));
+
+        findViewById(R.id.cardCalc).setOnClickListener(v ->
+                startActivity(new Intent(this, CalcActivity.class)));
+
+        findViewById(R.id.btnSettings).setOnClickListener(v ->
+                startActivity(new Intent(this, SettingsActivity.class)));
 
         cardStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
         btnStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
