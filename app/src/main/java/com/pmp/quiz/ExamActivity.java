@@ -89,6 +89,7 @@ public class ExamActivity extends AppCompatActivity {
         if (id == null) return "process";
         if (id.startsWith("1.2") || id.startsWith("3.1") || id.startsWith("3.2")
                 || id.startsWith("4.")) return "people";
+        if (id.startsWith("3.9")) return "business";
         return "process";
     }
 

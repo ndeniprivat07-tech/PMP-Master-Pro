@@ -253,6 +253,7 @@ public class QuizActivity extends AppCompatActivity {
     private String ecoFromSubId(String subId) {
         if (subId.startsWith("1.2") || subId.startsWith("3.1") || subId.startsWith("3.2")
                 || subId.startsWith("4.")) return "people";
+        if (subId.startsWith("3.9")) return "business";
         return "process";
     }
 
