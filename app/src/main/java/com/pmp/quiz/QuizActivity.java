@@ -137,7 +137,13 @@ public class QuizActivity extends AppCompatActivity {
         Question q = questions.get(currentIndex);
         boolean isCorrect = selected == q.getCorrectIndex();
 
-        if (isCorrect) score++;
+        if (isCorrect) {
+            score++;
+        } else {
+            // Répétition espacée : la question ratée entre en révision
+            new com.pmp.quiz.learn.ReviewManager(this).addFailure(
+                    q.getQuestion(), q.getOptions(), q.getCorrectIndex(), q.getExplication());
+        }
         dbHelper.updateStats(isCorrect, 30);
 
         for (int i = 0; i < optionsContainer.getChildCount(); i++) {

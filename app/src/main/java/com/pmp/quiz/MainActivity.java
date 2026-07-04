@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import com.pmp.quiz.database.DatabaseHelper;
 import com.pmp.quiz.learn.ProgressManager;
+import com.pmp.quiz.learn.ReviewManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -79,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
         cardLearn.setOnClickListener(v -> startActivity(new Intent(this, LearnActivity.class)));
 
+        findViewById(R.id.cardReview).setOnClickListener(v ->
+                startActivity(new Intent(this, ReviewActivity.class)));
+
         cardStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
         btnStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
     }
@@ -87,5 +91,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadStats();
+        updateReviewBadge();
+    }
+
+    /** Compteur de révision : incite l'utilisateur à s'exercer chaque jour */
+    private void updateReviewBadge() {
+        ReviewManager rm = new ReviewManager(this);
+        int due = rm.getDueCount();
+        int total = rm.getTotalCount();
+        android.widget.TextView tvReviewCount = findViewById(R.id.tvReviewCount);
+        if (due > 0) {
+            tvReviewCount.setText("⚡ " + due + " question(s) à réviser MAINTENANT — allez-y !");
+        } else if (total > 0) {
+            tvReviewCount.setText(total + " question(s) en mémoire — revenez demain, faites des exercices aujourd'hui");
+        } else {
+            tvReviewCount.setText("Vos erreurs reviendront ici à intervalles espacés");
+        }
     }
 }

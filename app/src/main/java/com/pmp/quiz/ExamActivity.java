@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import com.pmp.quiz.learn.ContentManager;
 import com.pmp.quiz.learn.ProgressManager;
+import com.pmp.quiz.learn.ReviewManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +25,8 @@ import java.util.List;
 public class ExamActivity extends AppCompatActivity {
 
     private ProgressManager progress;
+    private ReviewManager reviewManager;
+    private int erreursAjoutees = 0;
     private String type;
     private String subId;
     private int niveauId;
@@ -43,6 +46,7 @@ public class ExamActivity extends AppCompatActivity {
         setContentView(R.layout.activity_exam);
 
         progress = new ProgressManager(this);
+        reviewManager = new ReviewManager(this);
         type = getIntent().getStringExtra("type");
         subId = getIntent().getStringExtra("subId");
         niveauId = getIntent().getIntExtra("niveauId", -1);
@@ -143,7 +147,13 @@ public class ExamActivity extends AppCompatActivity {
         answered = true;
         ContentManager.QItem q = questions.get(currentIndex);
         boolean correct = selected == q.correct;
-        if (correct) score++;
+        if (correct) {
+            score++;
+        } else {
+            // Répétition espacée : la question ratée entre en révision
+            reviewManager.addFailure(q.q, q.options, q.correct, q.explication);
+            erreursAjoutees++;
+        }
 
         for (int i = 0; i < optionsContainer.getChildCount(); i++) {
             Button btn = (Button) optionsContainer.getChildAt(i);
@@ -224,6 +234,11 @@ public class ExamActivity extends AppCompatActivity {
             default:
                 titre = "Résultat";
                 message = "Score : " + pct + "%";
+        }
+
+        // Incitation à la révision répétitive
+        if (erreursAjoutees > 0) {
+            message += "\n\n🔁 " + erreursAjoutees + " question(s) ratée(s) ajoutée(s) à votre Révision du jour : refaites-les demain pour les ancrer durablement. La répétition est la clé !";
         }
 
         // Affichage du résultat en remplaçant le contenu

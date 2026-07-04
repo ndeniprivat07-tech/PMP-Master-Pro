@@ -52,6 +52,10 @@
             android:name=".ExamActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".ReviewActivity"
+            android:screenOrientation="portrait" />
+
         <receiver
             android:name=".services.NotificationReceiver"
             android:exported="false" />
