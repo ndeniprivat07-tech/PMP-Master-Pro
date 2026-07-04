@@ -106,31 +106,60 @@ public class LessonActivity extends AppCompatActivity {
         }
     }
 
+    private android.os.CountDownTimer lectureTimer;
+
     private void showSection(int index) {
         if (index < 0 || index >= sections.size()) return;
         currentSection = index;
         ContentManager.Section s = sections.get(index);
+        boolean dejaLue = isSectionRead(index);
 
-        tvSectionTitle.setText(sub.id + "." + (index + 1) + "  " + s.titre
-                + (isSectionRead(index) ? "  ✓" : ""));
+        tvSectionTitle.setText(sub.id + "." + (index + 1) + "  " + s.titre + (dejaLue ? "  ✓" : ""));
         tvLessonContent.setText(s.texte);
         tvSecCounter.setText((index + 1) + "/" + sections.size());
         btnPrevSec.setEnabled(index > 0);
-        btnNextSec.setText(index == sections.size() - 1 ? "✓ Terminer" : "Suivant ▶");
 
-        markSectionRead(index);
-        // Retitre le compteur avec la coche maintenant posée
-        tvSectionTitle.setText(sub.id + "." + (index + 1) + "  " + s.titre + "  ✓");
+        if (lectureTimer != null) lectureTimer.cancel();
+        final String labelSuivant = index == sections.size() - 1 ? "✓ Terminer" : "Suivant ▶";
+
+        if (dejaLue) {
+            // Section déjà lue : navigation libre
+            btnNextSec.setEnabled(true);
+            btnNextSec.setText(labelSuivant);
+        } else {
+            // Temps minimal de lecture : ~1 s pour 15 caractères (lecture réelle), entre 10 et 60 s
+            int secondes = Math.max(10, Math.min(60, s.texte.length() / 15));
+            btnNextSec.setEnabled(false);
+            lectureTimer = new android.os.CountDownTimer(secondes * 1000L, 1000) {
+                public void onTick(long ms) {
+                    btnNextSec.setText("📖 Lecture... " + (ms / 1000) + " s");
+                }
+                public void onFinish() {
+                    markSectionRead(currentSection);
+                    tvSectionTitle.setText(sub.id + "." + (currentSection + 1) + "  "
+                            + sections.get(currentSection).titre + "  ✓");
+                    btnNextSec.setEnabled(true);
+                    btnNextSec.setText(labelSuivant);
+                    refreshButtons();
+                }
+            }.start();
+        }
 
         if (index == sections.size() - 1) {
             btnNextSec.setOnClickListener(v -> {
-                Toast.makeText(this, "Section terminée ! Passez aux exercices 🏋️", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Leçon terminée ! Passez aux exercices 🏋️", Toast.LENGTH_SHORT).show();
                 refreshButtons();
             });
         } else {
             btnNextSec.setOnClickListener(v -> showSection(currentSection + 1));
         }
         refreshButtons();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (lectureTimer != null) lectureTimer.cancel();
     }
 
     // ===== Audio (service en arrière-plan) =====

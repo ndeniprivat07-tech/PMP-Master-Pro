@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "pmp_master_pro.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4; // v4 : plus de questions en base, le JSON est la source unique
 
     private static final String TABLE_QUESTIONS = "questions";
     private static final String COL_ID = "id";
@@ -83,8 +83,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         statsValues.put("temps_total", 0);
         statsValues.put("meilleur_score", 0);
         db.insert(TABLE_STATS, null, statsValues);
-
-        insertSampleQuestions(db);
     }
 
     private void insertSampleQuestions(SQLiteDatabase db) {

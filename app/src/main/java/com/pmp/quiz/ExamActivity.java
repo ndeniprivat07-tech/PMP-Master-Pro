@@ -119,10 +119,11 @@ public class ExamActivity extends AppCompatActivity {
             ContentManager.SousNiveau sub = ContentManager.findSousNiveau(this, subId);
             if (sub == null) return;
             if ("comprehension".equals(type)) {
+                // Remédiation exigeante : 10 questions, uniquement sur le contenu du sous-niveau
                 List<ContentManager.QItem> pool = new ArrayList<>(sub.pratique);
                 pool.addAll(sub.examen);
                 Collections.shuffle(pool);
-                int count = Math.min(5, pool.size());
+                int count = Math.min(10, pool.size());
                 questions = new ArrayList<>(pool.subList(0, count));
             } else { // pratique ET examen_sous : 20 questions
                 // Questions du sous-niveau d'abord, complétées par la banque du même domaine

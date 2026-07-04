@@ -198,7 +198,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Temps total"
+                    android:text="🔥 Série en cours"
                     android:textSize="15sp"
                     android:textColor="@color/secondary" />
 
@@ -228,7 +228,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Meilleur score"
+                    android:text="🔁 Questions en révision"
                     android:textSize="15sp"
                     android:textColor="@color/secondary" />
 
@@ -243,4 +243,22 @@
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp">
+
+        <TextView
+            android:id="@+id/tvExamHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:lineSpacingExtra="5dp"
+            android:textColor="@color/text_main"
+            android:background="@color/surface"
+            android:padding="16dp" />
+    </ScrollView>
 </LinearLayout>
