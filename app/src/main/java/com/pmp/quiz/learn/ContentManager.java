@@ -131,6 +131,46 @@ public class ContentManager {
         return list;
     }
 
+    // ===== Banque de questions d'examen (étiquetées par domaine ECO) =====
+
+    public static class BankQ extends QItem {
+        public String domain; // people | process | business
+    }
+
+    private static List<BankQ> bankCache;
+
+    public static List<BankQ> getBank(Context ctx) {
+        if (bankCache != null) return bankCache;
+        List<BankQ> bank = new ArrayList<>();
+        try {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    ctx.getAssets().open("exam_bank.json"), StandardCharsets.UTF_8));
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+            reader.close();
+
+            JSONObject root = new JSONObject(sb.toString());
+            JSONArray arr = root.getJSONArray("questions");
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject o = arr.getJSONObject(i);
+                BankQ q = new BankQ();
+                q.q = o.getString("q");
+                JSONArray opts = o.getJSONArray("o");
+                q.options = new String[opts.length()];
+                for (int k = 0; k < opts.length(); k++) q.options[k] = opts.getString(k);
+                q.correct = o.getInt("c");
+                q.explication = o.getString("e");
+                q.domain = o.optString("d", "process");
+                bank.add(q);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        bankCache = bank;
+        return bank;
+    }
+
     public static SousNiveau findSousNiveau(Context ctx, String subId) {
         for (Niveau n : getNiveaux(ctx)) {
             for (SousNiveau s : n.sousNiveaux) {

@@ -23,6 +23,10 @@ public class QuizActivity extends AppCompatActivity {
     private List<Question> questions = new ArrayList<>();
     private int currentIndex = 0;
     private int score = 0;
+    // Suivi par domaine ECO (People / Process / Business) pour le rapport d'examen
+    private final java.util.HashMap<Integer, String> ecoMap = new java.util.HashMap<>();
+    private final java.util.HashMap<String, Integer> ecoTotal = new java.util.HashMap<>();
+    private final java.util.HashMap<String, Integer> ecoCorrect = new java.util.HashMap<>();
     private String mode;
     private CountDownTimer timer;
     private boolean isAnswerShown = false;
@@ -74,7 +78,9 @@ public class QuizActivity extends AppCompatActivity {
 
     private void loadQuestions() {
         List<Question> all = dbHelper.getAllQuestions();
-        // Ajouter toutes les questions du parcours d'apprentissage (content.json)
+        for (Question q : all) ecoMap.put(q.getId(), ecoFromDomaine(q.getDomaine()));
+
+        // Questions du parcours d'apprentissage (content.json)
         int syntheticId = 100000;
         for (com.pmp.quiz.learn.ContentManager.Niveau niveau :
                 com.pmp.quiz.learn.ContentManager.getNiveaux(this)) {
@@ -82,15 +88,43 @@ public class QuizActivity extends AppCompatActivity {
                 List<com.pmp.quiz.learn.ContentManager.QItem> pool = new ArrayList<>(sub.pratique);
                 pool.addAll(sub.examen);
                 for (com.pmp.quiz.learn.ContentManager.QItem q : pool) {
+                    ecoMap.put(syntheticId, ecoFromSubId(sub.id));
                     all.add(new Question(syntheticId++, niveau.titre, "parcours", sub.titre,
                             q.q, q.options[0], q.options[1], q.options[2], q.options[3],
                             q.correct, q.explication, sub.id + " — " + sub.titre, "", 60, 2));
                 }
             }
         }
+
+        // Banque de questions d'examen (étiquetées ECO)
+        int bankId = 200000;
+        for (com.pmp.quiz.learn.ContentManager.BankQ q :
+                com.pmp.quiz.learn.ContentManager.getBank(this)) {
+            ecoMap.put(bankId, q.domain);
+            all.add(new Question(bankId++, "Banque examen", "banque", q.domain,
+                    q.q, q.options[0], q.options[1], q.options[2], q.options[3],
+                    q.correct, q.explication, "Banque PMP", "", 76, 3));
+        }
+
         Collections.shuffle(all);
         int limit = "examen".equals(mode) ? 180 : 20;
         questions = all.size() > limit ? new ArrayList<>(all.subList(0, limit)) : all;
+    }
+
+    /** Domaine ECO à partir du domaine d'une question de la base */
+    private String ecoFromDomaine(String domaine) {
+        if (domaine == null) return "process";
+        String d = domaine.toLowerCase();
+        if (d.contains("leadership") || d.contains("parties prenantes")) return "people";
+        if (d.contains("valeur")) return "business";
+        return "process";
+    }
+
+    /** Domaine ECO à partir du sous-niveau du parcours */
+    private String ecoFromSubId(String subId) {
+        if (subId.startsWith("1.2") || subId.startsWith("3.1") || subId.startsWith("3.2")
+                || subId.startsWith("4.")) return "people";
+        return "process";
     }
 
     private void showQuestion() {
@@ -144,6 +178,11 @@ public class QuizActivity extends AppCompatActivity {
             new com.pmp.quiz.learn.ReviewManager(this).addFailure(
                     q.getQuestion(), q.getOptions(), q.getCorrectIndex(), q.getExplication());
         }
+        // Suivi par domaine ECO
+        String eco = ecoMap.get(q.getId());
+        if (eco == null) eco = "process";
+        ecoTotal.put(eco, ecoTotal.containsKey(eco) ? ecoTotal.get(eco) + 1 : 1);
+        if (isCorrect) ecoCorrect.put(eco, ecoCorrect.containsKey(eco) ? ecoCorrect.get(eco) + 1 : 1);
         dbHelper.updateStats(isCorrect, 30);
 
         for (int i = 0; i < optionsContainer.getChildCount(); i++) {
@@ -211,6 +250,11 @@ public class QuizActivity extends AppCompatActivity {
         intent.putExtra("score", score);
         intent.putExtra("total", questions.size());
         intent.putExtra("mode", mode);
+        // Rapport par domaine ECO
+        for (String d : new String[]{"people", "process", "business"}) {
+            intent.putExtra(d + "_total", ecoTotal.containsKey(d) ? ecoTotal.get(d) : 0);
+            intent.putExtra(d + "_correct", ecoCorrect.containsKey(d) ? ecoCorrect.get(d) : 0);
+        }
         startActivity(intent);
         finish();
     }
