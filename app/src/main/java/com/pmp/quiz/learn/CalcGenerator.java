@@ -16,7 +16,7 @@ public class CalcGenerator {
     private static final Random rnd = new Random();
 
     public static ContentManager.QItem next() {
-        switch (rnd.nextInt(8)) {
+        switch (rnd.nextInt(12)) {
             case 0: return genCPI();
             case 1: return genSPI();
             case 2: return genEAC();
@@ -24,7 +24,11 @@ public class CalcGenerator {
             case 4: return genPERT();
             case 5: return genCanaux();
             case 6: return genEMV();
-            default: return genTCPI();
+            case 7: return genTCPI();
+            case 8: return genCheminCritique();
+            case 9: return genMargeTotale();
+            case 10: return genLag();
+            default: return genMargeImpact();
         }
     }
 
@@ -175,5 +179,86 @@ public class CalcGenerator {
 
     private static double round2(double v) {
         return Math.round(v * 100.0) / 100.0;
+    }
+
+    // ===== QCM DE PLANNING / ORDONNANCEMENT =====
+
+    /** Réseau simple : A -> (B et C en parallèle) -> D. Durée du chemin critique ? */
+    private static ContentManager.QItem genCheminCritique() {
+        int a = 2 + rnd.nextInt(5);
+        int b = 3 + rnd.nextInt(8);
+        int c = 3 + rnd.nextInt(8);
+        while (c == b) c = 3 + rnd.nextInt(8);
+        int d = 2 + rnd.nextInt(5);
+        int critique = a + Math.max(b, c) + d;
+        int autre = a + Math.min(b, c) + d;
+        String brancheCritique = b > c ? "B" : "C";
+        return make(
+                "Réseau du projet : l'activité A (" + a + " j) est suivie de B (" + b + " j) et C (" + c
+                        + " j) réalisées EN PARALLÈLE ; D (" + d + " j) ne peut commencer que lorsque B ET C sont terminées. "
+                        + "Quelle est la durée du chemin critique ?",
+                critique,
+                new double[]{autre, a + b + c + d, critique - 1},
+                " j",
+                "Le chemin critique passe par la branche la plus LONGUE : A(" + a + ") + " + brancheCritique
+                        + "(" + Math.max(b, c) + ") + D(" + d + ") = " + critique
+                        + " j. Piège : additionner toutes les activités (" + (a + b + c + d)
+                        + " j) alors que B et C sont en parallèle.");
+    }
+
+    /** Marge totale = LS - ES (ou LF - EF) */
+    private static ContentManager.QItem genMargeTotale() {
+        int es = 3 + rnd.nextInt(10);
+        int marge = 2 + rnd.nextInt(7);
+        int ls = es + marge;
+        int duree = 3 + rnd.nextInt(6);
+        return make(
+                "Une activité a : début au plus tôt (ES) = jour " + es + ", début au plus tard (LS) = jour " + ls
+                        + ", durée = " + duree + " j. Quelle est sa marge totale (total float) ?",
+                marge,
+                new double[]{ls + duree - es, duree, 0},
+                " j",
+                "Marge totale = LS − ES = " + ls + " − " + es + " = " + marge
+                        + " j. L'activité peut glisser de " + marge
+                        + " j sans retarder le projet. Rappel : une marge de 0 = activité du chemin critique.");
+    }
+
+    /** Décalage (lag) sur une liaison Fin-Début */
+    private static ContentManager.QItem genLag() {
+        int finA = 5 + rnd.nextInt(15);
+        int lag = 2 + rnd.nextInt(5);
+        int dureeB = 3 + rnd.nextInt(6);
+        int debutB = finA + lag;
+        int finB = debutB + dureeB;
+        return make(
+                "L'activité B suit l'activité A avec une liaison Fin-Début et un décalage (lag) de +" + lag
+                        + " j (ex. séchage du béton). A se termine au jour " + finA + " et B dure " + dureeB
+                        + " j. À quel jour B se termine-t-elle ?",
+                finB,
+                new double[]{finA + dureeB, finB - lag, finB + lag},
+                "",
+                "Début de B = fin de A + lag = " + finA + " + " + lag + " = jour " + debutB
+                        + ". Fin de B = " + debutB + " + " + dureeB + " = jour " + finB
+                        + ". Piège : oublier le lag (réponse " + (finA + dureeB) + ").");
+    }
+
+    /** Impact d'un retard selon la marge disponible */
+    private static ContentManager.QItem genMargeImpact() {
+        int marge = 2 + rnd.nextInt(6);
+        boolean depasse = rnd.nextBoolean();
+        int retard = depasse ? marge + 1 + rnd.nextInt(4) : 1 + rnd.nextInt(marge);
+        int impact = Math.max(0, retard - marge);
+        return make(
+                "Une activité HORS chemin critique dispose d'une marge totale de " + marge
+                        + " j. Elle prend " + retard + " j de retard. De combien la date de fin du PROJET est-elle décalée ?",
+                impact,
+                new double[]{retard, marge, impact == 0 ? retard + marge : 0},
+                " j",
+                impact == 0
+                        ? "Le retard (" + retard + " j) est inférieur ou égal à la marge (" + marge
+                                + " j) : la fin du projet n'est PAS affectée (0 j). La marge absorbe le glissement."
+                        : "Le retard (" + retard + " j) dépasse la marge (" + marge + " j) de " + impact
+                                + " j : le projet glisse de " + impact
+                                + " j — et cette activité intègre désormais le chemin critique.");
     }
 }
