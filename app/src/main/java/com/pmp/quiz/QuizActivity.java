@@ -29,6 +29,7 @@ public class QuizActivity extends AppCompatActivity {
     private final java.util.HashMap<String, Integer> ecoCorrect = new java.util.HashMap<>();
     private String mode;
     private CountDownTimer timer;
+    private long timeLeft = 0; // secondes restantes du chrono d'examen
     private boolean isAnswerShown = false;
     private int hintsUsed = 0;
     private static final int MAX_HINTS = 3;
@@ -381,6 +382,7 @@ public class QuizActivity extends AppCompatActivity {
         timer = new CountDownTimer((long) seconds * 1000, 1000) {
             public void onTick(long millisUntilFinished) {
                 long t = millisUntilFinished / 1000;
+                timeLeft = t; // mémorisé pour la reprise de session et les pauses
                 tvTimer.setText(String.format("%02d:%02d:%02d", t / 3600, (t % 3600) / 60, t % 60));
             }
             public void onFinish() {
