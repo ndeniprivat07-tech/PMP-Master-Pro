@@ -5,12 +5,13 @@
     android:orientation="vertical"
     android:background="@color/background">
 
+    <!-- En-tête -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="12dp">
+        android:padding="10dp">
 
         <Button
             android:id="@+id/btnBack"
@@ -27,11 +28,61 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Leçon"
-            android:textSize="17sp"
+            android:textSize="16sp"
             android:textColor="@color/primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSecCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1/7"
+            android:textSize="14sp"
+            android:textColor="@color/secondary"
             android:textStyle="bold" />
     </LinearLayout>
 
+    <!-- Barre audio -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <Button
+            android:id="@+id/btnAudio"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1.4"
+            android:text="🔊 Écouter"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            android:backgroundTint="@color/info"
+            android:layout_marginEnd="6dp" />
+
+        <Button
+            android:id="@+id/btnVoice"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:text="🎙️ Voix"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            android:backgroundTint="@color/secondary"
+            android:layout_marginEnd="6dp" />
+
+        <Button
+            android:id="@+id/btnSpeed"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:text="⏩ Vitesse"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            android:backgroundTint="@color/secondary" />
+    </LinearLayout>
+
+    <!-- Contenu de la section -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -42,50 +93,78 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="8dp">
 
-            <Button
-                android:id="@+id/btnAudio"
+            <TextView
+                android:id="@+id/tvSectionTitle"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:text="🔊 Écouter la leçon"
-                android:textAllCaps="false"
-                android:backgroundTint="@color/info" />
+                android:layout_height="wrap_content"
+                android:text="1.1.1 Section"
+                android:textSize="17sp"
+                android:textColor="@color/primary"
+                android:textStyle="bold"
+                android:padding="12dp"
+                android:background="@color/surface" />
 
             <TextView
                 android:id="@+id/tvLessonContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contenu de la leçon"
+                android:text="Contenu"
                 android:textSize="16sp"
                 android:lineSpacingExtra="6dp"
                 android:textColor="#222222"
                 android:background="@color/surface"
-                android:padding="20dp"
-                android:layout_marginTop="12dp" />
+                android:padding="16dp"
+                android:layout_marginTop="2dp" />
 
-            <Button
-                android:id="@+id/btnLeconLue"
+            <!-- Navigation entre sections -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:text="✅ J'ai lu la leçon"
-                android:textAllCaps="false"
-                android:backgroundTint="@color/success"
-                android:layout_marginTop="12dp" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
 
+                <Button
+                    android:id="@+id/btnPrevSec"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="◀ Précédent"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/secondary"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnNextSec"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Suivant ▶"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/primary" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/secondary"
+                android:alpha="0.3"
+                android:layout_marginVertical="14dp" />
+
+            <!-- Actions du sous-niveau -->
             <Button
                 android:id="@+id/btnPratique"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="50dp"
                 android:text="🏋️ Exercices de pratique (illimités)"
                 android:textAllCaps="false"
-                android:backgroundTint="@color/secondary"
-                android:layout_marginTop="8dp" />
+                android:backgroundTint="@color/secondary" />
 
             <Button
                 android:id="@+id/btnComprehension"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="50dp"
                 android:text="📚 Test de compréhension (80%)"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/warning"
@@ -95,7 +174,7 @@
             <Button
                 android:id="@+id/btnExamen"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="50dp"
                 android:text="🎓 Passer l'examen (80% requis)"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/primary"

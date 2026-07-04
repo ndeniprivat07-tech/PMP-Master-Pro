@@ -18,12 +18,53 @@ public class ContentManager {
         public String explication;
     }
 
+    public static class Section {
+        public String titre;
+        public String texte;
+    }
+
     public static class SousNiveau {
         public String id;
         public String titre;
         public String lecon;
         public List<QItem> pratique = new ArrayList<>();
         public List<QItem> examen = new ArrayList<>();
+
+        private List<Section> sections;
+
+        /** Découpe la leçon en sections à partir des titres numérotés ("1. TITRE"). */
+        public List<Section> getSections() {
+            if (sections != null) return sections;
+            sections = new ArrayList<>();
+            String[] lines = lecon.split("\n");
+            Section current = null;
+            StringBuilder body = new StringBuilder();
+            for (String line : lines) {
+                if (line.matches("^\\d+\\.\\s+.*")) {
+                    if (current != null) {
+                        current.texte = body.toString().trim();
+                        sections.add(current);
+                    }
+                    current = new Section();
+                    current.titre = line.replaceFirst("^\\d+\\.\\s+", "").trim();
+                    body = new StringBuilder();
+                } else {
+                    body.append(line).append("\n");
+                }
+            }
+            if (current != null) {
+                current.texte = body.toString().trim();
+                sections.add(current);
+            }
+            // Sécurité : si aucune section détectée, tout le texte devient une section unique
+            if (sections.isEmpty()) {
+                Section s = new Section();
+                s.titre = titre;
+                s.texte = lecon;
+                sections.add(s);
+            }
+            return sections;
+        }
     }
 
     public static class Niveau {
