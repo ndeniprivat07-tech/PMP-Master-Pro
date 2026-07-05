@@ -63,37 +63,49 @@ public class CalcActivity extends AppCompatActivity {
             showNext();
         });
 
-        // Reprendre la dernière catégorie choisie ; dialogue seulement à la première utilisation
-        String savedCat = getSharedPreferences("parametres", MODE_PRIVATE)
-                .getString("calc_categorie", null);
-        if (savedCat != null) {
-            categorie = savedCat;
-            for (int i = 0; i < CAT_VALUES.length; i++) {
-                if (CAT_VALUES[i].equals(categorie)) tvMode.setText(CAT_LABELS[i] + "  ▾");
-            }
-            showNext();
-        } else {
-            choisirCategorie();
-        }
+        choisirCategorie();
     }
 
-    /** L'utilisateur choisit le type de calculs qu'il veut travailler */
+    /** Écran de choix par bulles : gros boutons colorés, un par catégorie */
     private void choisirCategorie() {
-        int checked = 5;
-        for (int i = 0; i < CAT_VALUES.length; i++) if (CAT_VALUES[i].equals(categorie)) checked = i;
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("🧮 Quel type de calculs ?")
-                .setCancelable(false)
-                .setSingleChoiceItems(CAT_LABELS, checked, null)
-                .setPositiveButton("Commencer", (d, w) -> {
-                    int pos = ((android.app.AlertDialog) d).getListView().getCheckedItemPosition();
-                    categorie = CAT_VALUES[pos >= 0 ? pos : 5];
-                    tvMode.setText(CAT_LABELS[pos >= 0 ? pos : 5] + "  ▾");
-                    getSharedPreferences("parametres", MODE_PRIVATE)
-                            .edit().putString("calc_categorie", categorie).apply();
-                    showNext();
-                })
-                .show();
+        tvMode.setText("🧮 Calculs illimités");
+        tvQuestion.setText("Quel type de calculs voulez-vous travailler ?");
+        tvProgress.setText("");
+        tvFeedback.setVisibility(View.GONE);
+        btnNext.setEnabled(false);
+        btnNext.setText("Choisissez une catégorie ⬆️");
+        answered = false;
+
+        final int[] couleurs = {
+                0xFF2b8c5e,  // économie - vert
+                0xFF1a4a7a,  // planning - bleu
+                0xFFb13e3e,  // décision - rouge
+                0xFFe6a020,  // estimations - orange
+                0xFF1a7a8c,  // communication - cyan
+                0xFF6a4a8c}; // tout - violet
+
+        optionsContainer.removeAllViews();
+        for (int i = 0; i < CAT_LABELS.length; i++) {
+            final int idx = i;
+            Button bulle = new Button(this);
+            bulle.setText(CAT_LABELS[i]);
+            bulle.setAllCaps(false);
+            bulle.setTextSize(16);
+            bulle.setTextColor(0xFFFFFFFF);
+            bulle.setBackgroundTintList(android.content.res.ColorStateList.valueOf(couleurs[i]));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 150);
+            params.setMargins(0, 10, 0, 10);
+            bulle.setLayoutParams(params);
+            bulle.setOnClickListener(v -> {
+                categorie = CAT_VALUES[idx];
+                tvMode.setText(CAT_LABELS[idx] + "  ▾");
+                getSharedPreferences("parametres", MODE_PRIVATE)
+                        .edit().putString("calc_categorie", categorie).apply();
+                showNext();
+            });
+            optionsContainer.addView(bulle);
+        }
     }
 
     private void showNext() {

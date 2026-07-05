@@ -74,11 +74,24 @@ public class CalcGenerator {
         ContentManager.QItem item = new ContentManager.QItem();
         item.q = q;
         List<String> opts = new ArrayList<>();
-        opts.add(fmt(bonne) + unite);
-        for (double d : distracteurs) opts.add(fmt(d) + unite);
+        String bonneStr = fmt(bonne) + unite;
+        opts.add(bonneStr);
+        // Déduplication : aucun distracteur ne doit être identique à la bonne réponse ni à un autre
+        for (double d : distracteurs) {
+            double val = d;
+            int garde = 0;
+            String s = fmt(val) + unite;
+            while (opts.contains(s) && garde < 20) {
+                double pas = Math.max(1, Math.abs(bonne) * 0.15);
+                val = val + (garde % 2 == 0 ? pas * (garde / 2 + 1) : -pas * (garde / 2 + 1));
+                s = fmt(val) + unite;
+                garde++;
+            }
+            opts.add(s);
+        }
         Collections.shuffle(opts);
         item.options = opts.toArray(new String[0]);
-        item.correct = opts.indexOf(fmt(bonne) + unite);
+        item.correct = opts.indexOf(bonneStr);
         item.explication = explication;
         return item;
     }
@@ -150,20 +163,55 @@ public class CalcGenerator {
                         + " Les écarts se calculent toujours avec EV en premier.");
     }
 
+    private static final String[] CONTEXTES_PERT = {
+            "Le maçon estime le coulage des fondations",
+            "L'équipe estime le développement du module de paiement",
+            "Le bureau d'études estime la validation réglementaire",
+            "Le fournisseur estime la livraison du matériel",
+            "L'architecte estime la phase de conception",
+            "L'équipe de test estime la campagne de recette"};
+
     private static ContentManager.QItem genPERT() {
-        int o = 2 + rnd.nextInt(5);          // 2..6
-        int m = o + 2 + rnd.nextInt(4);      // o+2..o+5
-        int p = m + (6 - ((o + 4 * m) % 6) % 6); // ajuste pour un résultat entier
+        int o = 2 + rnd.nextInt(6);          // 2..7
+        int m = o + 2 + rnd.nextInt(5);      // o+2..o+6
+        int p = m + (6 - ((o + 4 * m) % 6) % 6);
         while ((o + 4 * m + p) % 6 != 0) p++;
         double res = (o + 4.0 * m + p) / 6;
+        String ctx = CONTEXTES_PERT[rnd.nextInt(CONTEXTES_PERT.length)];
+
+        // Une fois sur deux : question à deux étapes (durée attendue + écart-type)
+        if (rnd.nextBoolean() && (p - o) % 6 == 0) {
+            double sigma = (p - o) / 6.0;
+            ContentManager.QItem item = new ContentManager.QItem();
+            item.q = ctx + " : optimiste " + o + " j, plus probable " + m + " j, pessimiste " + p
+                    + " j. Quelle est la durée attendue ET son écart-type ?";
+            String bonne = fmt(res) + " j ± " + fmt(sigma) + " j";
+            List<String> opts = new ArrayList<>();
+            opts.add(bonne);
+            opts.add(fmt(round2((o + m + p) / 3.0)) + " j ± " + fmt(sigma) + " j");
+            opts.add(fmt(res) + " j ± " + fmt(round2(sigma * 2)) + " j");
+            opts.add(fmt(m) + " j ± " + fmt(round2((p - o) / 3.0)) + " j");
+            // dédoublonner si collision
+            for (int i = 1; i < opts.size(); i++) {
+                if (opts.get(i).equals(bonne)) opts.set(i, fmt(res + i) + " j ± " + fmt(sigma + i) + " j");
+            }
+            Collections.shuffle(opts);
+            item.options = opts.toArray(new String[0]);
+            item.correct = opts.indexOf(bonne);
+            item.explication = "Durée = (O + 4M + P) / 6 = (" + o + " + " + (4 * m) + " + " + p + ") / 6 = "
+                    + fmt(res) + " j. Écart-type = (P − O) / 6 = (" + p + " − " + o + ") / 6 = " + fmt(sigma)
+                    + " j. À ±1 écart-type, on couvre environ 68% des cas.";
+            return item;
+        }
+
         return make(
-                "Estimation à trois points (PERT) : optimiste = " + o + " j, plus probable = " + m
-                        + " j, pessimiste = " + p + " j. Quelle est la durée attendue ?",
+                ctx + " : optimiste = " + o + " j, plus probable = " + m
+                        + " j, pessimiste = " + p + " j. Quelle est la durée attendue (PERT) ?",
                 res,
-                new double[]{round2((o + m + p) / 3.0), m, round2(res + 1)},
+                new double[]{round2((o + m + p) / 3.0), m, round2((o + p) / 2.0)},
                 " j",
                 "PERT = (O + 4M + P) / 6 = (" + o + " + " + (4 * m) + " + " + p + ") / 6 = " + fmt(res)
-                        + " j. Piège classique : la moyenne simple (O+M+P)/3, qui ignore la pondération du cas probable.");
+                        + " j. Pièges : la moyenne simple (O+M+P)/3 et la moyenne des extrêmes (O+P)/2, qui ignorent la pondération ×4 du cas probable.");
     }
 
     private static ContentManager.QItem genCanaux() {
