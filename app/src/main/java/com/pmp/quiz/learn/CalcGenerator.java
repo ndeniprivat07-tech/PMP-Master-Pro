@@ -69,6 +69,12 @@ public class CalcGenerator {
         }
     }
 
+    /**
+     * Construit le QCM avec des distracteurs TRÈS PROCHES de la bonne réponse :
+     * - le 1er distracteur fourni = l'erreur conceptuelle classique (formule inversée, moyenne simple...)
+     * - les 2 autres = des quasi-bonnes réponses (légèrement décalées)
+     * Ainsi, seul celui qui a réellement fait le calcul trouve la bonne réponse.
+     */
     private static ContentManager.QItem make(String q, double bonne, double[] distracteurs,
                                              String unite, String explication) {
         ContentManager.QItem item = new ContentManager.QItem();
@@ -76,14 +82,27 @@ public class CalcGenerator {
         List<String> opts = new ArrayList<>();
         String bonneStr = fmt(bonne) + unite;
         opts.add(bonneStr);
-        // Déduplication : aucun distracteur ne doit être identique à la bonne réponse ni à un autre
-        for (double d : distracteurs) {
-            double val = d;
+
+        // Pas de proximité : petit décalage crédible selon la grandeur
+        boolean entier = bonne == Math.rint(bonne) && Math.abs(bonne) >= 3;
+        double pas;
+        if (Math.abs(bonne) < 3) pas = 0.05;                       // ratios (CPI, SPI, TCPI)
+        else if (Math.abs(bonne) < 30) pas = 1;                    // jours, canaux
+        else if (Math.abs(bonne) < 200) pas = Math.max(2, Math.round(Math.abs(bonne) * 0.05)); // k€ moyens
+        else pas = Math.max(5, Math.round(Math.abs(bonne) * 0.04)); // gros montants
+
+        // 1er distracteur : l'erreur classique (fournie par le générateur)
+        double erreurClassique = distracteurs.length > 0 ? distracteurs[0] : bonne + pas * 3;
+        // 2 quasi-bonnes réponses : juste au-dessus et juste en dessous
+        double[] finaux = {erreurClassique, bonne + pas, bonne - pas};
+
+        for (double d : finaux) {
+            double val = entier ? Math.rint(d) : round2(d);
             int garde = 0;
             String s = fmt(val) + unite;
             while (opts.contains(s) && garde < 20) {
-                double pas = Math.max(1, Math.abs(bonne) * 0.15);
-                val = val + (garde % 2 == 0 ? pas * (garde / 2 + 1) : -pas * (garde / 2 + 1));
+                val = val + (garde % 2 == 0 ? pas : -pas * 2);
+                val = entier ? Math.rint(val) : round2(val);
                 s = fmt(val) + unite;
                 garde++;
             }
