@@ -112,7 +112,7 @@ public class LessonActivity extends AppCompatActivity {
         if (index < 0 || index >= sections.size()) return;
         currentSection = index;
         ContentManager.Section s = sections.get(index);
-        boolean dejaLue = isSectionRead(index);
+        boolean dejaLue = isSectionRead(index) || progress.isDevUnlock(); // mode testeur : pas de compte à rebours
 
         tvSectionTitle.setText(sub.id + "." + (index + 1) + "  " + s.titre + (dejaLue ? "  ✓" : ""));
         tvLessonContent.setText(s.texte);
@@ -288,7 +288,7 @@ public class LessonActivity extends AppCompatActivity {
         boolean valide = progress.isSousNiveauValide(sub.id);
         boolean needRemed = progress.needsRemediation(sub.id) && !progress.isComprehensionOk(sub.id);
 
-        btnPratique.setEnabled(leconLue);
+        btnPratique.setEnabled(leconLue || progress.isDevUnlock());
         btnComprehension.setVisibility(needRemed ? View.VISIBLE : View.GONE);
 
         if (valide) {

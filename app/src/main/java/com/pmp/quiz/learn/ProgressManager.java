@@ -111,10 +111,23 @@ public class ProgressManager {
         recordStudy();
     }
 
+    // ===== Mode testeur (option cachée : 10 taps sur le titre de l'accueil) =====
+
+    public boolean isDevUnlock() {
+        return prefs.getBoolean("dev_unlock", false);
+    }
+
+    public boolean toggleDevUnlock() {
+        boolean nouveau = !isDevUnlock();
+        prefs.edit().putBoolean("dev_unlock", nouveau).apply();
+        return nouveau;
+    }
+
     // ===== Logique de déblocage =====
 
     /** Le sous-niveau est-il accessible ? (progression linéaire stricte) */
     public boolean isSousNiveauDebloque(List<ContentManager.Niveau> niveaux, String subId) {
+        if (isDevUnlock()) return true;
         for (int n = 0; n < niveaux.size(); n++) {
             ContentManager.Niveau niveau = niveaux.get(n);
             // Le niveau lui-même doit être débloqué (niveau précédent validé)
@@ -136,6 +149,7 @@ public class ProgressManager {
 
     /** L'examen de passage du niveau est-il accessible ? (tous les sous-niveaux validés) */
     public boolean isExamenNiveauDebloque(ContentManager.Niveau niveau) {
+        if (isDevUnlock()) return true;
         for (ContentManager.SousNiveau s : niveau.sousNiveaux) {
             if (!isSousNiveauValide(s.id)) return false;
         }
@@ -147,6 +161,7 @@ public class ProgressManager {
      * Conditions : leçon lue + pas de verrou 24h actif + (pas de remédiation OU compréhension validée)
      */
     public boolean canTakeExamen(String subId) {
+        if (isDevUnlock()) return true;
         if (!isLeconLue(subId)) return false;
         if (isLocked("sub_" + subId)) return false;
         if (needsRemediation(subId) && !isComprehensionOk(subId)) return false;

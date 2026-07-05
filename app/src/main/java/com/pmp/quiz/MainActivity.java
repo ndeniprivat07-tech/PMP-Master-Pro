@@ -96,6 +96,27 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnSettings).setOnClickListener(v ->
                 startActivity(new Intent(this, SettingsActivity.class)));
 
+        // Option cachée testeur : 10 taps sur le titre déverrouillent tous les niveaux
+        final int[] tapCount = {0};
+        final long[] lastTap = {0};
+        findViewById(R.id.tvAppTitle).setOnClickListener(v -> {
+            long now = System.currentTimeMillis();
+            if (now - lastTap[0] > 2000) tapCount[0] = 0; // taps espacés de +2s : on repart
+            lastTap[0] = now;
+            tapCount[0]++;
+            if (tapCount[0] >= 7 && tapCount[0] < 10) {
+                Toast.makeText(this, (10 - tapCount[0]) + "...", Toast.LENGTH_SHORT).show();
+            }
+            if (tapCount[0] >= 10) {
+                tapCount[0] = 0;
+                boolean actif = new ProgressManager(this).toggleDevUnlock();
+                Toast.makeText(this, actif
+                        ? "🔓 MODE TESTEUR ACTIVÉ — tout est déverrouillé"
+                        : "🔒 Mode testeur désactivé — verrouillage normal rétabli",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+
         cardStats.setOnClickListener(v -> startActivity(new Intent(this, StatsActivity.class)));
     }
 
